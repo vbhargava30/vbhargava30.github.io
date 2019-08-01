@@ -5,7 +5,15 @@
 <svg width=300 height=300>
 </svg>
 <script>
-async function init() {}
+async function init() {
+
+  d3.csv("https://github.com/vbhargava30/vbhargava30.github.io/blob/master/data.csv").then(function(data) {
+    data.forEach(function(d) {
+    });
+    
+    console.log(data[0]);
+  });  
+}
   
 </script>
 </body>
