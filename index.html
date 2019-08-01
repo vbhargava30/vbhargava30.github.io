@@ -10,17 +10,17 @@ async function init() {
   d3.csv("data.csv").then(function(data) {
     var parseDate = d3.timeParse("%Y-%m-%d");
     data.forEach(function(d) {
-      d.year = +d.year;
-      d.averagespeed = +d.averagespeed;
-      d.totaldistance = +d.totaldistance;
-      d.numberstages = +d.numberstages;
-      d.numberfinishers = +d.numberfinishers;
-      d.startdate = parseDate(d.startdate);
-      d.enddate = parseDate(d.enddate);
-      d.startinglongitude = +d.startinglongtitude;
-      d.startinglatitude = +d.startinglatitude;
-      d.finishinglongitude = +d.finishinglongitude;
-      d.finishinglatitude = +d.finishinglatitude;
+//       d.year = +d.year;
+//       d.averagespeed = +d.averagespeed;
+//       d.totaldistance = +d.totaldistance;
+//       d.numberstages = +d.numberstages;
+//       d.numberfinishers = +d.numberfinishers;
+//       d.startdate = parseDate(d.startdate);
+//       d.enddate = parseDate(d.enddate);
+//       d.startinglongitude = +d.startinglongtitude;
+//       d.startinglatitude = +d.startinglatitude;
+//       d.finishinglongitude = +d.finishinglongitude;
+//       d.finishinglatitude = +d.finishinglatitude;
     });
     
     console.log(data[0]);
