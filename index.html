@@ -8,7 +8,7 @@
 async function init() {
 
   d3.csv("data.csv").then(function(data) {
-    var parseDate = d3.timeFormat("%Y-%m-%d");
+    var parseDate = d3.timeParse("%Y-%m-%d");
     data.forEach(function(d) {
       d.year = +d.year;
       d.averagespeed = +d.averagespeed;
