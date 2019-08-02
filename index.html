@@ -1,32 +1,171 @@
 <html>
-<script src='https://d3js.org/d3.v5.min.js'></script>
-<style> circle {fill: lightblue; stroke: black;} </style>
-<body onload='init()'>
-<svg width=300 height=300>
-</svg>
-<script>
-async function init() {
+    <!-- Imports. -->
+    <script src='https://d3js.org/d3.v5.min.js'></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 
-  d3.csv("data.csv").then(function(data) {
-    var parseDate = d3.timeParse("%Y-%m-%d");
-    data.forEach(function(d) {
-//       d.year = +d.year;
-//       d.averagespeed = +d.averagespeed;
-//       d.totaldistance = +d.totaldistance;
-//       d.numberstages = +d.numberstages;
-//       d.numberfinishers = +d.numberfinishers;
-//       d.startdate = parseDate(d.startdate);
-//       d.enddate = parseDate(d.enddate);
-//       d.startinglongitude = +d.startinglongtitude;
-//       d.startinglatitude = +d.startinglatitude;
-//       d.finishinglongitude = +d.finishinglongitude;
-//       d.finishinglatitude = +d.finishinglatitude;
-    });
-    
-    console.log(data[0]);
-  });  
-}
-  
-</script>
-</body>
+    <body>
+
+    <script>
+        function clearAllCharts() {
+            d3.selectAll("svg > *").remove();
+            d3.selectAll("svg").remove();
+        }
+    </script>    
+
+    <script>
+        async function theFirstChart() {
+            clearAllCharts();
+            await d3.csv("data.csv").then(function(data) {
+                var dateParser = d3.timeParse("%m/%d/%Y");
+                data.forEach(function(d) {
+                    d.year = +d.year;
+                    d.averagespeed = +d.averagespeed;
+                    d.totaldistance = +d.totaldistance;
+                    d.numberstages = +d.numberstages;
+                    d.numberfinishers = +d.numberfinishers;
+                    d.startinglongitude = +d.startinglongitude;
+                    d.startinglatitude = +d.startinglatitude;
+                    d.finishinglongitude = +d.finishinglongitude;
+                    d.finishinglatitude = +d.finishinglatitude;
+                    d.startdate = dateParser(d.startdate);
+                    d.enddate = dateParser(d.enddate);
+                    });
+                    console.log("Data successfully loaded.");
+
+                    // Writing in the chart for total distance.
+
+                    var chartHeight = $("#firstChart").height();
+
+                    var chartWidth = $("#firstChart").width();
+
+                    var svg = d3.select("#firstChart").append("svg").attr("width", chartWidth.toString()).attr("height", chartHeight.toString());
+
+                    var selectMaster = d3.select("#firstChart").select("svg");
+
+                    var maxDistance = d3.max(data, function(d) { return d.totaldistance; });
+
+                    var y = d3.scaleLinear().domain([0, maxDistance + 500]).range([chartHeight - 200, 0]);
+
+                    var xDomain = [data[0].year];
+
+                    for (var i = 1; i < data.length; i++) {
+                        xDomain.push(data[i].year);
+                    }
+                
+                    var x = d3.scaleBand().domain(xDomain).range([0, chartWidth - 200]);
+
+                    svg.append("g").attr("transform", "translate(100, 100)").call(d3.axisLeft(y));
+
+                    var inputTranslate = chartHeight - 100;
+
+                    var inputTranslateString = "translate(100, " + inputTranslate.toString() + ")";
+
+                    // Create the x-axis label.
+
+                    var xLabel = "translate(" + (chartWidth/2) + ", " + (chartHeight - 50) + ")";
+
+                    console.log(xLabel)
+
+                    selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
+                    .text("Years (1903-2016)");
+
+                    var xLabel2 = "translate(" + (chartWidth/2) + ", " + (chartHeight - 30) + ")";
+
+                    selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
+                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.");
+
+                    selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
+                    .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]))
+
+                    // Create the y-axis label.
+
+                    selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
+                    .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision");
+
+                    var chart = d3.select("#firstChart").select("svg").selectAll("rect").data(data).enter().append("rect")
+                    .attr("fill", function(d) {
+                        if (d.totaldistance < 4000) {
+                            return "#008000";
+                        } else if (d.totaldistance < 5000) {
+                            return "#12620a";
+                        } else {
+                            return "#13290c";
+                        }
+                    })
+                    .attr("x", (d)=>x(d.year)).attr("y", (d)=>y(d.totaldistance))
+                    .attr("height", (d) => chartHeight - 200 - y(d.totaldistance)).attr("width", x.bandwidth())
+                    .attr("stroke", "black").attr("stroke-width", 0.5);
+
+                    chart.attr("transform", "translate(101, 100)");
+
+                    // Create the legend if the width is high enough.
+
+                    if (window.innerWidth > 675) {
+                        var legend1Height = chartHeight - 500;
+                        var legend2Height = legend1Height + 25;
+                        var legend3Height = legend2Height + 25;
+                        var textOffset = 9.5;
+
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#008000");
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 4,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+
+
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#12620a");
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 4,000m and 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+
+
+                        
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#13290c");
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Between 5,000m and 6,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                    }
+            });  
+        }
+    </script>
+
+    <h1 align = "center">Has the Tour de France become easier over time? (7-3-3 CS 498) </h1>
+    <h4 align = "center">By: Varun Bhargava</h4>
+
+    <div class = "container" style = "width: 100%; height: 83%">
+        <div class = "col-md-3" style = "width: 100% ; height: 100%">
+            <ul class = "nav nav-pills nav-jt">
+                <li class = "active">
+                    <a data-toggle = "tab" id = "chart1" href = "#chart1" onclick = "theFirstChart()">Total race distance</a>
+                </li>
+
+                <li>
+                    <a data-toggle = "tab" id = "chart2" href = "#chart2" onclick = "clearAllCharts()">Percentage finished</a>
+                </li>
+
+                <li>
+                    <a data-toggle = "tab" id = "chart3" href = "#chart3" onclick = "clearAllCharts()">Average racer speed</a>
+                </li>
+            </ul>
+            <div class = "tab-content" style = "height: 100%; width: 100%">
+                <div id = "chart1" class = "tab-pane fade active in" style = "height : 100%; width : 100%">
+                    <div id = "firstChart" style = "height : 100%; width : 100%;">
+                        <script>
+                            theFirstChart();
+                        </script>
+                    </div>
+
+                </div>
+
+                <div id = "chart2" class = "tab-pane">
+                    <div id = "secondChart" style = "height : 100%; width : 100%;">
+                    </div>
+                </div>
+
+                <div id = "chart3" class = "tab-pane">
+                    <div id = "thirdChart" style = "height : 100%; width : 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </body>
 </html>
