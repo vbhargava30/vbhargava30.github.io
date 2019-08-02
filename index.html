@@ -29,7 +29,6 @@
                 <div id = "chart1" class = "tab-pane fade active in" style = "height : 100%; width : 100%">
                     <div id = "firstChart" style = "height : 100%; width : 100%;">
                     </div>
-
                 </div>
 
                 <div id = "chart2" class = "tab-pane">
@@ -95,7 +94,7 @@
                 
                     var x = d3.scaleBand().domain(xDomain).range([0, chartWidth - 200]);
 
-                    selectMaster.append("g").attr("transform", "translate(100,100)").call(d3.axisLeft(y));
+                    selectMaster.append("g").attr("transform", "translate(100,100)").call(d3.axisLeft(y)).attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     var inputTranslate = chartHeight - 100;
 
@@ -106,20 +105,23 @@
                     var xLabel = "translate(" + (chartWidth/2) + "," + (chartHeight - 50) + ")";
 
                     selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
-                    .text("Years (1903-2016)");
+                    .text("Years (1903-2016)").attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     var xLabel2 = "translate(" + (chartWidth/2) + ", " + (chartHeight - 30) + ")";
 
                     selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
-                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.");
+                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
                     .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]))
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     // Create the y-axis label.
 
                     selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
-                    .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision");
+                    .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
                     .attr("fill", function(d, i) {
@@ -134,15 +136,20 @@
                     .attr("x", function(d, i) {
                         return x(d.year);
                     })
+                    .attr("width", x.bandwidth())
+                    .attr("stroke", "black").attr("stroke-width", 0.5)
+                    .attr("transform", "translate(101,100)")
+                    .attr("y", chartHeight)
+                    .attr("height", 0)
+                    .transition()
+                    .duration(800)
+                    .ease(d3.easeCubic)
                     .attr("y", function(d, i) {
                         return y(d.totaldistance);
                     })
                     .attr("height", function(d, i) {
                         return chartHeight - 200 - y(d.totaldistance);
-                    })
-                    .attr("width", x.bandwidth())
-                    .attr("stroke", "black").attr("stroke-width", 0.5)
-                    .attr("transform", "translate(101,100)");
+                    });
 
                     // Create the legend if the width is high enough.
 
@@ -152,24 +159,35 @@
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
 
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#008000");
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#008000")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 4,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#12620a");
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#12620a")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 4,000m and 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
 
                         
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#13290c");
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#13290c")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Between 5,000m and 6,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                     }
+
+                    // Make annotiations.
+
+
+
             });  
         }
     </script>
+
 
     <script>theFirstChart();</script>
 
