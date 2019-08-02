@@ -44,7 +44,7 @@
 
                     var selectMaster = d3.select("#firstChart").select("svg");
 
-                    var maxDistance = d3.max(data, function(d) { return d.totaldistance; });
+                    var maxDistance = d3.max(data, function(d) { return +d.totaldistance; });
 
                     var y = d3.scaleLinear().domain([0, maxDistance + 500]).range([chartHeight - 200, 0]);
 
@@ -95,13 +95,13 @@
                         }
                     })
                     .attr("x", function(d) {
-                        return x(d.year);
+                        return x(+d.year);
                     })
                     .attr("y", function(d) {
-                        return y(d.totaldistance);
+                        return y(+d.totaldistance);
                     })
                     .attr("height", function(d) {
-                        return chartHeight - 200 - y(d.totaldistance);
+                        return (chartHeight - 200) - y(+d.totaldistance);
                     })
                     .attr("width", x.bandwidth())
                     .attr("stroke", "black").attr("stroke-width", 0.5);
