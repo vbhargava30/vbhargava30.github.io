@@ -85,7 +85,7 @@
                     .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision");
 
                     var chart = selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
-                    .attr("fill", function(d) {
+                    .attr("fill", function(d, i) {
                         if (d.totaldistance < 4000) {
                             return "#008000";
                         } else if (d.totaldistance < 5000) {
@@ -94,13 +94,13 @@
                             return "#13290c";
                         }
                     })
-                    .attr("x", function(d) {
+                    .attr("x", function(d, i) {
                         return x(d.year);
                     })
-                    .attr("y", function(d) {
+                    .attr("y", function(d, i) {
                         return y(d.totaldistance);
                     })
-                    .attr("height", function(d) {
+                    .attr("height", function(d, i) {
                         return chartHeight - 200 - y(d.totaldistance);
                     })
                     .attr("width", x.bandwidth())
