@@ -7,6 +7,44 @@
 
     <body>
 
+    <h1 align = "center">Has the Tour de France become easier over time?</h1>
+    <h4 align = "center">By: Varun Bhargava</h4>
+
+    <div class = "container" style = "width: 100%; height: 83%">
+        <div class = "col-md-3" style = "width: 100% ; height: 100%">
+            <ul class = "nav nav-pills nav-jt">
+                <li class = "active">
+                    <a data-toggle = "tab" id = "chart1" href = "#chart1" onclick = "theFirstChart()">Total race distance</a>
+                </li>
+
+                <li>
+                    <a data-toggle = "tab" id = "chart2" href = "#chart2" onclick = "clearAllCharts()">Percentage finished</a>
+                </li>
+
+                <li>
+                    <a data-toggle = "tab" id = "chart3" href = "#chart3" onclick = "clearAllCharts()">Average racer speed</a>
+                </li>
+            </ul>
+            <div class = "tab-content" style = "height: 100%; width: 100%">
+                <div id = "chart1" class = "tab-pane fade active in" style = "height : 100%; width : 100%">
+                    <div id = "firstChart" style = "height : 100%; width : 100%;">
+                    </div>
+
+                </div>
+
+                <div id = "chart2" class = "tab-pane">
+                    <div id = "secondChart" style = "height : 100%; width : 100%;">
+                    </div>
+                </div>
+
+                <div id = "chart3" class = "tab-pane">
+                    <div id = "thirdChart" style = "height : 100%; width : 100%;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         function clearAllCharts() {
             d3.selectAll("svg > *").remove();
@@ -15,9 +53,9 @@
     </script>    
 
     <script>
-        async function theFirstChart() {
+        function theFirstChart() {
             clearAllCharts();
-            await d3.csv("data.csv").then(function(data) {
+            d3.csv("data.csv").then(function(data) {
                 var dateParser = d3.timeParse("%m/%d/%Y");
                 data.forEach(function(d) {
                     d.year = +d.year;
@@ -32,6 +70,7 @@
                     d.startdate = dateParser(d.startdate);
                     d.enddate = dateParser(d.enddate);
                     });
+                    
                     console.log("Data successfully loaded.");
 
                     // Writing in the chart for total distance.
@@ -65,8 +104,6 @@
                     // Create the x-axis label.
 
                     var xLabel = "translate(" + (chartWidth/2) + "," + (chartHeight - 50) + ")";
-
-                    console.log(xLabel)
 
                     selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
                     .text("Years (1903-2016)");
@@ -134,45 +171,7 @@
         }
     </script>
 
-    <h1 align = "center">Has the Tour de France become easier over time? (7-3-3 CS 498) </h1>
-    <h4 align = "center">By: Varun Bhargava</h4>
+    <script>theFirstChart();</script>
 
-    <div class = "container" style = "width: 100%; height: 83%">
-        <div class = "col-md-3" style = "width: 100% ; height: 100%">
-            <ul class = "nav nav-pills nav-jt">
-                <li class = "active">
-                    <a data-toggle = "tab" id = "chart1" href = "#chart1" onclick = "theFirstChart()">Total race distance</a>
-                </li>
-
-                <li>
-                    <a data-toggle = "tab" id = "chart2" href = "#chart2" onclick = "clearAllCharts()">Percentage finished</a>
-                </li>
-
-                <li>
-                    <a data-toggle = "tab" id = "chart3" href = "#chart3" onclick = "clearAllCharts()">Average racer speed</a>
-                </li>
-            </ul>
-            <div class = "tab-content" style = "height: 100%; width: 100%">
-                <div id = "chart1" class = "tab-pane fade active in" style = "height : 100%; width : 100%">
-                    <div id = "firstChart" style = "height : 100%; width : 100%;">
-                        <script>
-                            theFirstChart();
-                        </script>
-                    </div>
-
-                </div>
-
-                <div id = "chart2" class = "tab-pane">
-                    <div id = "secondChart" style = "height : 100%; width : 100%;">
-                    </div>
-                </div>
-
-                <div id = "chart3" class = "tab-pane">
-                    <div id = "thirdChart" style = "height : 100%; width : 100%;">
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
     </body>
 </html>
