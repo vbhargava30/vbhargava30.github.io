@@ -94,8 +94,8 @@
                             return "#13290c";
                         }
                     })
-                    .attr("x", (d)=>x(d.year)).attr("y", (d)=>y(d.totaldistance))
-                    .attr("length", (d) => chartHeight - 200 - y(d.totaldistance)).attr("width", x.bandwidth())
+                    .attr("x", (data)=>x(data.year)).attr("y", (data)=>y(data.totaldistance))
+                    .attr("height", (data) => chartHeight - 200 - y(data.totaldistance)).attr("width", x.bandwidth())
                     .attr("stroke", "black").attr("stroke-width", 0.5);
 
                     chart.attr("transform", "translate(101, 100)");
