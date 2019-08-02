@@ -95,13 +95,13 @@
                         }
                     })
                     .attr("x", function(d) {
-                        return x(+d.year);
+                        return +x(+d.year);
                     })
                     .attr("y", function(d) {
-                        return y(+d.totaldistance);
+                        return +y(+d.totaldistance);
                     })
                     .attr("height", function(d) {
-                        return (chartHeight - 200) - y(+d.totaldistance);
+                        return (chartHeight - 200) - (+y(+d.totaldistance));
                     })
                     .attr("width", x.bandwidth())
                     .attr("stroke", "black").attr("stroke-width", 0.5);
