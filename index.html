@@ -56,7 +56,7 @@
                 
                     var x = d3.scaleBand().domain(xDomain).range([0, chartWidth - 200]);
 
-                    svg.append("g").attr("transform", "translate(100, 100)").call(d3.axisLeft(y));
+                    selectMaster.append("g").attr("transform", "translate(100, 100)").call(d3.axisLeft(y));
 
                     var inputTranslate = chartHeight - 100;
 
@@ -84,7 +84,7 @@
                     selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
                     .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision");
 
-                    var chart = d3.select("#firstChart").select("svg").selectAll("rect").data(data).enter().append("rect")
+                    var chart = selectMaster.selectAll("rect").data(data).enter().append("rect")
                     .attr("fill", function(d) {
                         if (d.totaldistance < 4000) {
                             return "#008000";
