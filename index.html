@@ -95,7 +95,7 @@
                         }
                     })
                     .attr("x", (d)=>x(d.year)).attr("y", (d)=>y(d.totaldistance))
-                    .attr("height", (d) => chartHeight - 200 - y(d.totaldistance)).attr("width", x.bandwidth())
+                    .attr("length", (d) => chartHeight - 200 - y(d.totaldistance)).attr("width", x.bandwidth())
                     .attr("stroke", "black").attr("stroke-width", 0.5);
 
                     chart.attr("transform", "translate(101, 100)");
