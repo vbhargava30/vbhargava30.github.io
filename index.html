@@ -84,7 +84,7 @@
                     selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
                     .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision");
 
-                    var chart = selectMaster.selectAll("rect").data(data).enter().append("rect")
+                    var chart = selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
                     .attr("fill", function(d) {
                         if (d.totaldistance < 4000) {
                             return "#008000";
