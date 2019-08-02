@@ -4,13 +4,29 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <script src='d3-annotation.min.js'></script>
 
     <body>
 
-    <h1 align = "center">Has the Tour de France become easier over time?</h1>
+    <style>
+
+        #tooltip {
+            position: absolute;	
+            opacity: 0;		
+            text-align: center;			
+            width: 250px;					
+            height: 80px;										
+            background: lightsteelblue;	
+            border: 0px;		
+            border-radius: 8px;		
+        }
+
+    </style>
+
+    <h2 align = "center">Has the Tour de France become easier over time?</h1>
     <h4 align = "center">By: Varun Bhargava</h4>
 
-    <div class = "container" style = "width: 100%; height: 83%">
+    <div class = "container" style = "width: 100%; height: 70%">
         <div class = "col-md-3" style = "width: 100% ; height: 100%">
             <ul class = "nav nav-pills nav-jt">
                 <li class = "active">
@@ -18,27 +34,18 @@
                 </li>
 
                 <li>
-                    <a data-toggle = "tab" id = "chart2" href = "#chart2" onclick = "clearAllCharts()">Percentage finished</a>
+                    <a data-toggle = "tab" id = "chart2" href = "#chart2" onclick = "theSecondChart()">Average winner speed</a>
                 </li>
 
                 <li>
-                    <a data-toggle = "tab" id = "chart3" href = "#chart3" onclick = "clearAllCharts()">Average racer speed</a>
+                    <a data-toggle = "tab" id = "chart3" href = "#chart3" onclick = "theThirdChart()">Percentage racers finished</a>
                 </li>
             </ul>
             <div class = "tab-content" style = "height: 100%; width: 100%">
                 <div id = "chart1" class = "tab-pane fade active in" style = "height : 100%; width : 100%">
                     <div id = "firstChart" style = "height : 100%; width : 100%;">
                     </div>
-                </div>
-
-                <div id = "chart2" class = "tab-pane">
-                    <div id = "secondChart" style = "height : 100%; width : 100%;">
-                    </div>
-                </div>
-
-                <div id = "chart3" class = "tab-pane">
-                    <div id = "thirdChart" style = "height : 100%; width : 100%;">
-                    </div>
+                    <div id = "tooltip"></div>
                 </div>
             </div>
         </div>
@@ -46,13 +53,15 @@
 
     <script>
         function clearAllCharts() {
+            d3.select("#firstChart").selectAll("h4").remove();
+            d3.select("#firstChart").selectAll("p").remove();
             d3.selectAll("svg > *").remove();
             d3.selectAll("svg").remove();
         }
     </script>    
 
     <script>
-        function theFirstChart() {
+        function theFirstChart(firstTime) {
             clearAllCharts();
             d3.csv("data.csv").then(function(data) {
                 var dateParser = d3.timeParse("%m/%d/%Y");
@@ -70,7 +79,7 @@
                     d.enddate = dateParser(d.enddate);
                     });
                     
-                    console.log("Data successfully loaded.");
+                    console.log("Data for chart 1 successfully loaded.");
 
                     // Writing in the chart for total distance.
 
@@ -103,34 +112,46 @@
                     // Create the x-axis label.
 
                     var xLabel = "translate(" + (chartWidth/2) + "," + (chartHeight - 50) + ")";
-
-                    selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
-                    .text("Years (1903-2016)").attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
-
+                    
                     var xLabel2 = "translate(" + (chartWidth/2) + ", " + (chartHeight - 30) + ")";
 
-                    selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
-                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.")
-                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                    if (firstTime == "true") {
+                        selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
+                        .text("Years (1903-2016)").attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                    selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
-                    .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]))
-                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                        selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
+                        .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
+                        .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]))
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                    } else {
+                        selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
+                        .text("Years (1903-2016)");
+
+                        selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
+                        .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.");
+
+                        selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
+                        .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]));
+                    }
+
 
                     // Create the y-axis label.
 
                     selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
-                    .attr("text-anchor", "middle").text("Total race distance in meters").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
+                    .attr("text-anchor", "middle").text("Total race distance in meters (m)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
                     .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
                     .attr("fill", function(d, i) {
                         if (d.totaldistance < 4000) {
-                            return "#008000";
+                            return "#71d45c";
                         } else if (d.totaldistance < 5000) {
-                            return "#12620a";
+                            return "#038303";
                         } else {
-                            return "#13290c";
+                            return "#003300";
                         }
                     })
                     .attr("x", function(d, i) {
@@ -154,29 +175,27 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 500;
+                        var legend1Height = chartHeight - 550;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
 
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#008000")
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 4,000m").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#12620a")
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#038303")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 4,000m and 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
-
-
                         
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#13290c")
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Between 5,000m and 6,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Over 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                     }
 
@@ -188,8 +207,347 @@
         }
     </script>
 
+    <script>
 
-    <script>theFirstChart();</script>
+        function theSecondChart() {
+            clearAllCharts();
+            d3.csv("data.csv").then(function(data) {
+                var dateParser = d3.timeParse("%m/%d/%Y");
+                data.forEach(function(d) {
+                    d.year = +d.year;
+                    d.averagespeed = +d.averagespeed;
+                    d.totaldistance = +d.totaldistance;
+                    d.numberstages = +d.numberstages;
+                    d.numberfinishers = +d.numberfinishers;
+                    d.startinglongitude = +d.startinglongitude;
+                    d.startinglatitude = +d.startinglatitude;
+                    d.finishinglongitude = +d.finishinglongitude;
+                    d.finishinglatitude = +d.finishinglatitude;
+                    d.startdate = dateParser(d.startdate);
+                    d.enddate = dateParser(d.enddate);
+                    d.percentagefinished = +d.percentagefinished;
+                    });
+                    
+                    console.log("Data for chart 2 successfully loaded.");
+
+                    d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
+                    .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.");
+
+                    d3.select("#firstChart").append("p").attr("align", "middle")
+                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!")
+
+                    var chartHeight = $("#firstChart").height();
+
+                    var chartWidth = $("#firstChart").width();
+
+                    var svg = d3.select("#firstChart").append("svg").attr("width", chartWidth.toString()).attr("height", chartHeight.toString());
+
+                    var selectMaster = d3.select("#firstChart").select("svg");
+
+                    var maxSpeed = d3.max(data, function(d) { return d.averagespeed; });
+
+                    var y = d3.scaleLinear().domain([0, maxSpeed + 5]).range([chartHeight - 200, 0]);
+
+                    var xDomain = [data[0].year];
+
+                    for (var i = 1; i < data.length; i++) {
+                        xDomain.push(data[i].year);
+                    }
+                
+                    var x = d3.scaleBand().domain(xDomain).range([0, chartWidth - 200]);
+
+                    selectMaster.append("g").attr("transform", "translate(100,100)").call(d3.axisLeft(y)).attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                    var inputTranslate = chartHeight - 100;
+
+                    var inputTranslateString = "translate(100," + inputTranslate.toString() + ")";
+
+                    // Create the x-axis label.
+
+                    var xLabel = "translate(" + (chartWidth/2) + "," + (chartHeight - 50) + ")";
+
+                    selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
+                    .text("Years (1903-2016)");
+
+                    var xLabel2 = "translate(" + (chartWidth/2) + ", " + (chartHeight - 30) + ")";
+
+                    selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
+                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.");
+
+                    selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
+                    .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]));
+
+                    // Create the y-axis label.
+
+                    selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
+                    .attr("text-anchor", "middle").text("Winner's average speed in kilometers per hour (km/h)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                    // Create the tooltip.
+
+                    var tooltip = d3.select("#tooltip");
+
+                    selectMaster.selectAll("rect").data(data).enter().append("rect")
+                    .attr("fill", function(d, i) {
+                        if (d.averagespeed < 30) {
+                            return "#71d45c";
+                        } else if (d.averagespeed < 35) {
+                            return "#038303";
+                        } else {
+                            return "#003300";
+                        }
+                    })
+                    .attr("x", function(d, i) {
+                        return x(d.year);
+                    })
+                    .attr("width", x.bandwidth())
+                    .attr("stroke", "black").attr("stroke-width", 0.5)
+                    .attr("transform", "translate(101,100)")
+                    .attr("y", chartHeight)
+                    .attr("height", 0)
+                    .on("mouseover", function(d) {
+                        tooltip
+                        .style("opacity", 1)
+                        .style("left", d3.event.pageX + "px")
+                        .style("top", d3.event.pageY - 100 + "px")
+                        .html("Year: " + d.year + "<br/>" + "Winner's Name: " + d.winnername + "<br/>" + "Winner's Team: " + d.winnerteam + 
+                        "<br/>" + "Average Speed: " + d.averagespeed + " km/h");
+                    })
+                    .on("mouseout", function(){
+                        tooltip
+                        .style("opacity", 0);
+                    })
+                    .transition()
+                    .duration(800)
+                    .ease(d3.easeCubic)
+                    .attr("y", function(d, i) {
+                        return y(d.averagespeed);
+                    })
+                    .attr("height", function(d, i) {
+                        return chartHeight - 200 - (y(d.averagespeed));
+                    });
+
+
+                    // Create the legend if the width is high enough.
+
+                    if (window.innerWidth > 675) {
+                        var legend1Height = chartHeight - 500;
+                        var legend2Height = legend1Height + 25;
+                        var legend3Height = legend2Height + 25;
+                        var textOffset = 9.5;
+
+                        selectMaster.append("rect").attr("x", chartWidth - 350).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 320).attr("y", legend1Height + textOffset).text("Under 30 km/h").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("rect").attr("x", chartWidth - 350).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#038303")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 320).attr("y", legend2Height + textOffset).text("Between 30 km/h and 35 km/h").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                        
+                        selectMaster.append("rect").attr("x", chartWidth - 350).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 320).attr("y", legend3Height + textOffset).text("Over 35 km/h").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                    }
+
+                    console.log(x(data[2].year))
+                    console.log(y(data[2].averagespeed))
+                    // Make annotiations.
+
+                    const type = d3.annotationLabel;
+
+                    const annotations = [{
+                    note: {
+                        label: "Competing bicyclists were slower early on in the Tour's history, with an average speed of 26.7 km/h from 1903-1933.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[13].year) + 100 + x.bandwidth()/2,
+                    y: y(data[13].averagespeed) + 100,
+                    className: "show-bg",
+                    dy: -45,
+                    dx: 30
+                    }, {
+                    note: {
+                        label: "Although slightly inconsistent, speeds increased between the mid 30s and mid 70s. Average speed increased to 34.2 km/h in this time period.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[45].year) + 100 + x.bandwidth()/2,
+                    y: y(data[45].averagespeed) + 100,
+                    className: "show-bg",
+                    dy: -45,
+                    dx: 25
+                    },
+                    {
+                    note: {
+                        label: "Speeds have broken the 35 km/h mark regularly for over 40 years, with average speeds hovering around 40 km/h in recent history",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[80].year) + 100 + x.bandwidth()/2,
+                    y: y(data[80].averagespeed) + 100,
+                    className: "show-bg",
+                    dy: -45,
+                    dx: -125
+                    },
+                    ];
+
+                    const makeAnnotations = d3.annotation()
+                    .editMode(false)
+                    .notePadding(5)
+                    .type(type)
+                    .annotations(annotations);
+
+                    selectMaster
+                    .append("g")
+                    .attr("class", "annotation-group")
+                    .call(makeAnnotations)
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+            });
+        }
+    </script>
+
+
+<script>
+        function theThirdChart() {
+            clearAllCharts();
+            d3.csv("data.csv").then(function(data) {
+                var dateParser = d3.timeParse("%m/%d/%Y");
+                data.forEach(function(d) {
+                    d.year = +d.year;
+                    d.averagespeed = +d.averagespeed;
+                    d.totaldistance = +d.totaldistance;
+                    d.numberstages = +d.numberstages;
+                    d.numberfinishers = +d.numberfinishers;
+                    d.startinglongitude = +d.startinglongitude;
+                    d.startinglatitude = +d.startinglatitude;
+                    d.finishinglongitude = +d.finishinglongitude;
+                    d.finishinglatitude = +d.finishinglatitude;
+                    d.startdate = dateParser(d.startdate);
+                    d.enddate = dateParser(d.enddate);
+                    d.percentagefinished = +d.percentagefinished;
+                    });
+                    
+                    console.log("Data for chart 3 successfully loaded.");
+
+                    var chartHeight = $("#firstChart").height();
+
+                    var chartWidth = $("#firstChart").width();
+
+                    var svg = d3.select("#firstChart").append("svg").attr("width", chartWidth.toString()).attr("height", chartHeight.toString());
+
+                    var selectMaster = d3.select("#firstChart").select("svg");
+
+                    var maxPercent = d3.max(data, function(d) { return d.percentagefinished; });
+
+                    var y = d3.scaleLinear().domain([0, maxPercent + 5]).range([chartHeight - 200, 0]);
+
+                    var xDomain = [data[0].year];
+
+                    for (var i = 1; i < data.length; i++) {
+                        xDomain.push(data[i].year);
+                    }
+                
+                    var x = d3.scaleBand().domain(xDomain).range([0, chartWidth - 200]);
+
+                    selectMaster.append("g").attr("transform", "translate(100,100)").call(d3.axisLeft(y).tickFormat(d => d + "%")).attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                    var inputTranslate = chartHeight - 100;
+
+                    var inputTranslateString = "translate(100," + inputTranslate.toString() + ")";
+
+                    // Create the x-axis label.
+
+                    var xLabel = "translate(" + (chartWidth/2) + "," + (chartHeight - 50) + ")";
+
+                    selectMaster.append("text").attr("transform", xLabel).attr("text-anchor", "middle").attr("font-weight", "bold")
+                    .text("Years (1903-2016)");
+
+                    var xLabel2 = "translate(" + (chartWidth/2) + ", " + (chartHeight - 30) + ")";
+
+                    selectMaster.append("text").attr("transform", xLabel2).attr("text-anchor", "middle")
+                    .text("Note: the Tour de France did not take place between the years 1915-1918 and 1940-1946.");
+
+                    selectMaster.append("g").attr("transform", inputTranslateString).call(d3.axisBottom(x)
+                    .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]));
+
+                    // Create the y-axis label.
+
+                    selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
+                    .attr("text-anchor", "middle").text("Percentage of racers that finished (%)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                    selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
+                    .attr("fill", function(d, i) {
+                        if (d.percentagefinished < 33.33) {
+                            return "#71d45c";
+                        } else if (d.percentagefinished < 66.66) {
+                            return "#038303";
+                        } else {
+                            return "#003300";
+                        }
+                    })
+                    .attr("x", function(d, i) {
+                        return x(d.year);
+                    })
+                    .attr("width", x.bandwidth())
+                    .attr("stroke", "black").attr("stroke-width", 0.5)
+                    .attr("transform", "translate(101,100)")
+                    .attr("y", chartHeight)
+                    .attr("height", 0)
+                    .transition()
+                    .duration(800)
+                    .ease(d3.easeCubic)
+                    .attr("y", function(d, i) {
+                        return y(d.percentagefinished);
+                    })
+                    .attr("height", function(d, i) {
+                        return chartHeight - 200 - (y(d.percentagefinished));
+                    });
+
+                    // Create the legend if the width is high enough.
+
+                    if (window.innerWidth > 675) {
+                        var legend1Height = chartHeight - 550;
+                        var legend2Height = legend1Height + 25;
+                        var legend3Height = legend2Height + 25;
+                        var textOffset = 9.5;
+
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 33.33%").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#038303")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 33.33% and 66.66%").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                        
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Over 66.66%").style("font-size", "19px").attr("alignment-baseline","middle")
+                        .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
+                    }
+
+                    // Make annotiations.
+
+
+
+            });
+        }
+    </script>
+
+
+    <script>theFirstChart("true");</script>
 
     </body>
 </html>
