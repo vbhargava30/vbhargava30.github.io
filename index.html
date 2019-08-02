@@ -37,12 +37,8 @@
                     // Writing in the chart for total distance.
 
                     var chartHeight = $("#firstChart").height();
-                    
-                    console.log(chartHeight);
 
                     var chartWidth = $("#firstChart").width();
-                
-                    console.log(chartWidth);
 
                     var svg = d3.select("#firstChart").append("svg").attr("width", chartWidth.toString()).attr("height", chartHeight.toString());
 
@@ -98,8 +94,16 @@
                             return "#13290c";
                         }
                     })
-                    .attr("x", (data)=>x(data.year)).attr("y", (data)=>y(data.totaldistance))
-                    .attr("height", (data) => chartHeight - 200 - y(data.totaldistance)).attr("width", x.bandwidth())
+                    .attr("x", function(d) {
+                        return x(d.year);
+                    })
+                    .attr("y", function(d) {
+                        return y(d.totaldistance);
+                    })
+                    .attr("height", function(d) {
+                        return chartHeight - 200 - y(d.totaldistance);
+                    })
+                    .attr("width", x.bandwidth())
                     .attr("stroke", "black").attr("stroke-width", 0.5);
 
                     chart.attr("transform", "translate(101, 100)");
