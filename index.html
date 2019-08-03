@@ -81,6 +81,12 @@
                     
                     console.log("Data for chart 1 successfully loaded.");
 
+                    d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
+                    .text("Although total distance increased briefly in the Tour's early years, total distance has dropped since 1926.");
+
+                    d3.select("#firstChart").append("p").attr("align", "middle")
+                    .text("From a peak of 5,745 km in 1926, the Tour de France now spans an average distance around 3,500 km. Mouse over individual bars for more data!");
+
                     // Writing in the chart for total distance.
 
                     var chartHeight = $("#firstChart").height();
@@ -137,14 +143,18 @@
                         .tickValues([1903, 1908, 1914, 1924, 1929, 1934, 1939, 1952, 1957, 1962, 1967, 1972, 1977, 1982, 1987, 1992, 1997, 2002, 2007, 2012, 2016]));
                     }
 
+                    var tooltip = d3.select("#tooltip");
 
                     // Create the y-axis label.
 
                     selectMaster.append("text").attr("transform", "rotate(-90)").attr("y", 30).attr("x", -(chartHeight/2))
-                    .attr("text-anchor", "middle").text("Total race distance in meters (m)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
+                    .attr("text-anchor", "middle").text("Total race distance in kilometers (km)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
                     .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
+                    .attr("id", function(d) {
+                        return "rectangle" + d.year;
+                    })
                     .attr("fill", function(d, i) {
                         if (d.totaldistance < 4000) {
                             return "#71d45c";
@@ -162,6 +172,45 @@
                     .attr("transform", "translate(101,100)")
                     .attr("y", chartHeight)
                     .attr("height", 0)
+                    .on("mouseover", function(d) {
+                        function datediff(d) {
+                                return Math.round((d.enddate-d.startdate)/(1000*60*60*24));
+                        }
+
+                        if (d3.event.pageX > window.innerWidth/2) {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX - 275 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
+                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        } else {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX + 5 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
+                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        }
+                    })
+                    .on("mouseout", function(d){
+                        tooltip
+                        .style("opacity", 0);
+
+                        if (d.totaldistance < 4000) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#71d45c");
+                        } else if (d.totaldistance < 5000) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#038303");
+                        } else {
+                            d3.select("#rectangle" + d.year).attr("fill", "#003300");
+                        }
+                    })
                     .transition()
                     .duration(800)
                     .ease(d3.easeCubic)
@@ -175,7 +224,7 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 550;
+                        var legend1Height = chartHeight - 475;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
@@ -183,25 +232,86 @@
                         selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 4,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 4,000km").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend2Height).attr("width", 15).attr("height", 15).attr("fill", "#038303")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 4,000m and 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 4,000km and 5,000km").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                         
                         selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
-                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Over 5,000m").style("font-size", "19px").attr("alignment-baseline","middle")
+                        selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Over 5,000km").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                     }
 
                     // Make annotiations.
 
+                    const type = d3.annotationLabel;
 
+                    const annotations = [{
+                    note: {
+                        label: "Early on in the Tour's history, the course's length increased significantly.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[5].year) + 100 + x.bandwidth()/2,
+                    y: y(data[5].totaldistance) + 100,
+                    className: "show-bg",
+                    dy: -55,
+                    dx: 20
+                    }, {
+                    note: {
+                        label: "Eventually, the rise in distance stopped in 1926 at 5,745km, after distance increased by over 2,500km since the Tour's start.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[19].year) + 100 + x.bandwidth()/2,
+                    y: y(data[19].totaldistance) + 100,
+                    className: "show-bg",
+                    dy: -10,
+                    dx: 5
+                    },
+                    {
+                    note: {
+                        label: "Total distance continued to drop after the 1926 peak, but it stayed above 4,000km for almost 40 years.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[39].year) + 100 + x.bandwidth()/2,
+                    y: y(data[39].totaldistance) + 100,
+                    className: "show-bg",
+                    dy: -45,
+                    dx: 20
+                    },
+                    {
+                    note: {
+                        label: "Today, distances remain below 4,000km, stabilizing at about 3,500km in recent history.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[92].year) + 100 + x.bandwidth()/2,
+                    y: y(data[92].totaldistance) + 100,
+                    className: "show-bg",
+                    dy: -35,
+                    dx: 20
+                    },
+                    ];
+
+                    const makeAnnotations = d3.annotation()
+                    .editMode(false)
+                    .notePadding(5)
+                    .type(type)
+                    .annotations(annotations);
+
+                    selectMaster
+                    .append("g")
+                    .attr("class", "annotation-group")
+                    .call(makeAnnotations)
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
             });  
         }
@@ -234,7 +344,7 @@
                     .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.");
 
                     d3.select("#firstChart").append("p").attr("align", "middle")
-                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!")
+                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!");
 
                     var chartHeight = $("#firstChart").height();
 
@@ -288,6 +398,9 @@
                     var tooltip = d3.select("#tooltip");
 
                     selectMaster.selectAll("rect").data(data).enter().append("rect")
+                    .attr("id", function(d) {
+                        return "rectangle" + d.year;
+                    })
                     .attr("fill", function(d, i) {
                         if (d.averagespeed < 30) {
                             return "#71d45c";
@@ -306,16 +419,41 @@
                     .attr("y", chartHeight)
                     .attr("height", 0)
                     .on("mouseover", function(d) {
-                        tooltip
-                        .style("opacity", 1)
-                        .style("left", d3.event.pageX + "px")
-                        .style("top", d3.event.pageY - 100 + "px")
-                        .html("Year: " + d.year + "<br/>" + "Winner's Name: " + d.winnername + "<br/>" + "Winner's Team: " + d.winnerteam + 
-                        "<br/>" + "Average Speed: " + d.averagespeed + " km/h");
+                        if (d3.event.pageX > window.innerWidth/2) {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX - 275 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Average Speed: " + d.averagespeed + " km/h"  + "</b>" + "<br/>" +
+                            "<b>" + "Winner's Name: " + "</b>" + d.winnername + "<br/>" + 
+                            "<b>" + "Winner's Team: " + "</b>" + d.winnerteam + "<br/>"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        } else {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX + 5 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Average Speed: " + d.averagespeed + " km/h"  + "</b>" + "<br/>" +
+                            "<b>" + "Winner's Name: " + "</b>" + d.winnername + "<br/>" + 
+                            "<b>" + "Winner's Team: " + "</b>" + d.winnerteam + "<br/>"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        }
                     })
-                    .on("mouseout", function(){
+                    .on("mouseout", function(d){
                         tooltip
                         .style("opacity", 0);
+
+                        if (d.averagespeed < 30) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#71d45c");
+                        } else if (d.averagespeed < 35) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#038303");
+                        } else {
+                            d3.select("#rectangle" + d.year).attr("fill", "#003300");
+                        }
                     })
                     .transition()
                     .duration(800)
@@ -331,7 +469,7 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 500;
+                        var legend1Height = chartHeight - 475;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
@@ -355,8 +493,6 @@
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                     }
 
-                    console.log(x(data[2].year))
-                    console.log(y(data[2].averagespeed))
                     // Make annotiations.
 
                     const type = d3.annotationLabel;
@@ -436,6 +572,12 @@
                     
                     console.log("Data for chart 3 successfully loaded.");
 
+                    d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
+                    .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.");
+
+                    d3.select("#firstChart").append("p").attr("align", "middle")
+                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!");
+
                     var chartHeight = $("#firstChart").height();
 
                     var chartWidth = $("#firstChart").width();
@@ -484,6 +626,9 @@
                     .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
+                    .attr("id", function(d) {
+                        return "rectangle" + d.year;
+                    })
                     .attr("fill", function(d, i) {
                         if (d.percentagefinished < 33.33) {
                             return "#71d45c";
@@ -501,6 +646,45 @@
                     .attr("transform", "translate(101,100)")
                     .attr("y", chartHeight)
                     .attr("height", 0)
+                    .on("mouseover", function(d) {
+                        function datediff(d) {
+                                return Math.round((d.enddate-d.startdate)/(1000*60*60*24));
+                        }
+
+                        if (d3.event.pageX > window.innerWidth/2) {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX - 275 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
+                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        } else {
+                            tooltip
+                            .style("opacity", 1)
+                            .style("left", d3.event.pageX + 5 + "px")
+                            .style("top", d3.event.pageY - 100 + "px")
+                            .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
+                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
+                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+
+                            d3.select("#rectangle" + d.year).attr("fill", "gray");
+                        }
+                    })
+                    .on("mouseout", function(d){
+                        tooltip
+                        .style("opacity", 0);
+
+                        if (d.totaldistance < 4000) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#71d45c");
+                        } else if (d.totaldistance < 5000) {
+                            d3.select("#rectangle" + d.year).attr("fill", "#038303");
+                        } else {
+                            d3.select("#rectangle" + d.year).attr("fill", "#003300");
+                        }
+                    })
                     .transition()
                     .duration(800)
                     .ease(d3.easeCubic)
@@ -514,7 +698,7 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 550;
+                        var legend1Height = chartHeight - 475;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
