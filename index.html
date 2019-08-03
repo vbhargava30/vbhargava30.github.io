@@ -82,7 +82,7 @@
                     console.log("Data for chart 1 successfully loaded.");
 
                     d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
-                    .text("Although total distance increased briefly in the Tour's early years, total distance has dropped since 1926.");
+                    .text("Although total distance increased briefly in the Tour's early years, total distance has dropped since 1926.")
 
                     d3.select("#firstChart").append("p").attr("align", "middle")
                     .text("From a peak of 5,745 km in 1926, the Tour de France now spans an average distance around 3,500 km. Mouse over individual bars for more data!");
@@ -224,7 +224,7 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 475;
+                        var legend1Height = 0;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
@@ -341,10 +341,12 @@
                     console.log("Data for chart 2 successfully loaded.");
 
                     d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
-                    .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.");
+                    .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     d3.select("#firstChart").append("p").attr("align", "middle")
-                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!");
+                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     var chartHeight = $("#firstChart").height();
 
@@ -469,7 +471,7 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 475;
+                        var legend1Height = 0;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
@@ -573,10 +575,12 @@
                     console.log("Data for chart 3 successfully loaded.");
 
                     d3.select("#firstChart").append("h4").attr("align", "middle").attr("font-weight", "bold")
-                    .text("Between the years 1903 and 2016, the average speed of Tour de France winners dramatically increased.");
+                    .text("Early on, less than 40% of cyclists could finish the race. More than double the percentage of riders finish the Tour today.")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     d3.select("#firstChart").append("p").attr("align", "middle")
-                    .text("The average speed early in the race's history was around 25 km/h. Today, winners average 40 km/h. Mouse over individual bars for more data!");
+                    .text("In 1919, a low 14% of cyclists finished. In the middle of the 20th century, finish rates vastly improved. Today, rates between 80-90% are routine.  Mouse over individual bars for more data!")
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                     var chartHeight = $("#firstChart").height();
 
@@ -625,6 +629,8 @@
                     .attr("text-anchor", "middle").text("Percentage of racers that finished (%)").attr("font-weight", "bold").attr("text-rendering", "geometricPrecision")
                     .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
+                    var tooltip = d3.select("#tooltip");
+
                     selectMaster.append("g").selectAll("rect").data(data).enter().append("rect")
                     .attr("id", function(d) {
                         return "rectangle" + d.year;
@@ -647,9 +653,6 @@
                     .attr("y", chartHeight)
                     .attr("height", 0)
                     .on("mouseover", function(d) {
-                        function datediff(d) {
-                                return Math.round((d.enddate-d.startdate)/(1000*60*60*24));
-                        }
 
                         if (d3.event.pageX > window.innerWidth/2) {
                             tooltip
@@ -657,8 +660,9 @@
                             .style("left", d3.event.pageX - 275 + "px")
                             .style("top", d3.event.pageY - 100 + "px")
                             .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
-                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
-                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+                            "<b>" + "Percentage Finished: " + Math.round(d.percentagefinished) + "%"  + "</b>" + "<br/>" +
+                            "<b>" + "Number of Entrants: " + "</b>" + d.numberentrants + " cyclists" + "<br/>" +
+                            "<b>" + "Number of Finishers: " + "</b>" + d.numberfinishers + " cyclists"); 
 
                             d3.select("#rectangle" + d.year).attr("fill", "gray");
                         } else {
@@ -667,8 +671,9 @@
                             .style("left", d3.event.pageX + 5 + "px")
                             .style("top", d3.event.pageY - 100 + "px")
                             .html("<b>" + "Year: " + "</b>" + d.year + "<br/>" + 
-                            "<b>" + "Total Distance: " + d.totaldistance + " km"  + "</b>" + "<br/>" +
-                            "<b>" + "Race Duration: " + "</b>" + datediff(d) + " days"); 
+                            "<b>" + "Percentage Finished: " + Math.round(d.percentagefinished) + "%"  + "</b>" + "<br/>" +
+                            "<b>" + "Number of Entrants: " + "</b>" + d.numberentrants + " cyclists" + "<br/>" +
+                            "<b>" + "Number of Finishers: " + "</b>" + d.numberfinishers + " cyclists"); 
 
                             d3.select("#rectangle" + d.year).attr("fill", "gray");
                         }
@@ -677,9 +682,9 @@
                         tooltip
                         .style("opacity", 0);
 
-                        if (d.totaldistance < 4000) {
+                        if (d.percentagefinished < 33.3) {
                             d3.select("#rectangle" + d.year).attr("fill", "#71d45c");
-                        } else if (d.totaldistance < 5000) {
+                        } else if (d.percentagefinished < 66.6) {
                             d3.select("#rectangle" + d.year).attr("fill", "#038303");
                         } else {
                             d3.select("#rectangle" + d.year).attr("fill", "#003300");
@@ -698,12 +703,12 @@
                     // Create the legend if the width is high enough.
 
                     if (window.innerWidth > 675) {
-                        var legend1Height = chartHeight - 475;
+                        var legend1Height = 0;
                         var legend2Height = legend1Height + 25;
                         var legend3Height = legend2Height + 25;
                         var textOffset = 9.5;
 
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend1Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend1Height + textOffset).text("Under 33.33%").style("font-size", "19px").attr("alignment-baseline","middle")
@@ -715,7 +720,7 @@
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend2Height + textOffset).text("Between 33.33% and 66.66%").style("font-size", "19px").attr("alignment-baseline","middle")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
                         
-                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#71d45c")
+                        selectMaster.append("rect").attr("x", chartWidth - 375).attr("y", legend3Height).attr("width", 15).attr("height", 15).attr("fill", "#003300")
                         .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
                         selectMaster.append("text").attr("x", chartWidth - 345).attr("y", legend3Height + textOffset).text("Over 66.66%").style("font-size", "19px").attr("alignment-baseline","middle")
@@ -725,6 +730,56 @@
                     // Make annotiations.
 
 
+                    const type = d3.annotationLabel;
+
+                    const annotations = [{
+                    note: {
+                        label: "While inconsistent, in the first years of the Tour, less than half of cyclists could finish.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[12].year) + 100 + x.bandwidth()/2,
+                    y: y(data[12].percentagefinished) + 100,
+                    className: "show-bg",
+                    dy: -80,
+                    dx: 9
+                    }, {
+                    note: {
+                        label: "In the second half of the 20th century, except for 1957, more than half of cyclists finished the Tour. Occasionally, more than 2/3 cyclists finished.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[50].year) + 100 + x.bandwidth()/2,
+                    y: y(data[50].percentagefinished) + 100,
+                    className: "show-bg",
+                    dy: -55,
+                    dx: -10
+                    },
+                    {
+                    note: {
+                        label: "In modern times, far more than 2/3 cyclists are finishing, and a fairly steady rise can be seen. Today, 80-90% racers finish.",
+                        bgPadding: 5,
+                    },
+                    //can use x, y directly instead of data
+                    x: x(data[85].year) + 100 + x.bandwidth()/2,
+                    y: y(data[85].percentagefinished) + 100,
+                    className: "show-bg",
+                    dy: -30,
+                    dx: -200
+                    },
+                    ];
+
+                    const makeAnnotations = d3.annotation()
+                    .editMode(false)
+                    .notePadding(5)
+                    .type(type)
+                    .annotations(annotations);
+
+                    selectMaster
+                    .append("g")
+                    .attr("class", "annotation-group")
+                    .call(makeAnnotations)
+                    .attr("opacity", 0).transition().delay(800).duration(1000).attr("opacity", 1);
 
             });
         }
